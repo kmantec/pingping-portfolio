@@ -10,7 +10,7 @@ The family signs in through **Firebase Authentication** and manages the archive 
 
 The website looks for data in this order:
 
-1. **Google Sheet** - stores the 24-column achievement records, including the last family role that edited each item.
+1. **Google Sheet** - stores the 25-column achievement records, including the optional month and last family role that edited each item.
 2. **Google Drive** - stores profile photos and up to five image/PDF evidence files per achievement.
 3. **Apps Script** - provides profile and achievement CRUD operations.
 4. **Built-in sample data** (`data/portfolio.js`) - used only when the live sheet cannot be loaded.

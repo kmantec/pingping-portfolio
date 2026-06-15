@@ -14,6 +14,12 @@ function fmtDate(value) {
   return isNaN(date) ? value : date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
+function entryPeriod(entry) {
+  var month = String(entry.month || "").trim();
+  var year = String(entry.year || "").trim();
+  return month && year ? month + " " + year : fmtDate(year);
+}
+
 function isYes(value) { return /^(y|yes|true|1|✓|core|use)/i.test((value || "").toString().trim()); }
 function driveId(url) {
   var match = (url || "").match(/\/d\/([-\w]{15,})/) || (url || "").match(/[?&]id=([-\w]{15,})/);
@@ -106,7 +112,7 @@ function renderEntry(entry) {
   var meta = [entry.school, entry.role ? "Role: " + entry.role : "", entry.participationType, entry.frequency, entry.duration].filter(Boolean);
   var attachmentHtml = sharedEntry.attachments.map(attachmentButton).join("");
   $("#shareEntry").innerHTML = '<article class="entry share-entry">' +
-    '<div class="entry-top"><h2 class="entry-title">' + esc(entry.title) + '</h2><span class="entry-date">' + esc(fmtDate(entry.year)) + '</span></div>' +
+    '<div class="entry-top"><h2 class="entry-title">' + esc(entry.title) + '</h2><span class="entry-date">' + esc(entryPeriod(entry)) + '</span></div>' +
     '<div class="badges">' + badges + '</div>' +
     (entry.organizer ? '<p class="entry-org">Organized by <strong>' + esc(entry.organizer) + '</strong></p>' : "") +
     (meta.length ? '<p class="entry-meta">' + meta.map(esc).join(" · ") + '</p>' : "") +
@@ -126,7 +132,7 @@ function openViewer(index) {
   var attachment = sharedEntry.attachments[index];
   if (!attachment) return;
   $("#viewerTitle").textContent = sharedEntry.title;
-  $("#viewerSub").textContent = (sharedEntry.organizer || "") + (sharedEntry.year ? " · " + fmtDate(sharedEntry.year) : "");
+  $("#viewerSub").textContent = (sharedEntry.organizer || "") + (sharedEntry.year ? " · " + entryPeriod(sharedEntry) : "");
   $("#viewerTabs").innerHTML = sharedEntry.attachments.map(function (item, itemIndex) {
     return '<button class="vtab' + (itemIndex === index ? " active" : "") + '" data-view-index="' + itemIndex + '">' + esc(item.label || ("File " + (itemIndex + 1))) + '</button>';
   }).join("");

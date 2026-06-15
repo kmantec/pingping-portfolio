@@ -37,7 +37,7 @@ function val(id) { var el = $(id); return el ? el.value.trim() : ""; }
 function setVal(id, v) { var el = $(id); if (el) el.value = v || ""; }
 
 var FIELD_IDS = {
-  title: "#f-title", category: "#f-category", year: "#f-year", level: "#f-level",
+  title: "#f-title", category: "#f-category", year: "#f-year", month: "#f-month", level: "#f-level",
   result: "#f-result", rank: "#f-rank", organizer: "#f-organizer", age: "#f-age",
   grade: "#f-grade", school: "#f-school", participationType: "#f-ptype", role: "#f-role",
   frequency: "#f-frequency", duration: "#f-duration", evidenceType: "#f-etype",
@@ -427,12 +427,25 @@ function filteredEntries() {
     if (listState.year && String(entry.year || "") !== listState.year) return false;
     if (!query) return true;
     var searchable = [
-      entry.recordId, entry.title, entry.year, entry.category, entry.level,
+      entry.recordId, entry.title, entry.year, entry.month, entry.category, entry.level,
       entry.result, entry.rank, entry.organizer, entry.school, entry.grade,
       entry.role, entry.participationType, entry.notes
     ].join(" ").toLowerCase();
     return searchable.indexOf(query) >= 0;
+  }).sort(function (a, b) {
+    var yearDifference = Number(b.year || 0) - Number(a.year || 0);
+    if (yearDifference) return yearDifference;
+    return monthNumber(b.month) - monthNumber(a.month);
   });
+}
+
+function monthNumber(value) {
+  var months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+  return months.indexOf(String(value || "").trim().toLowerCase()) + 1;
+}
+
+function achievementPeriod(entry) {
+  return [entry.month, entry.year].filter(Boolean).join(" ");
 }
 
 function showForm() {
@@ -510,7 +523,7 @@ function renderList() {
   $("#listMsg").textContent = "Showing " + (start + 1) + "–" + (start + pageEntries.length) + " of " + filtered.length +
     (filtered.length !== entriesCache.length ? " matches (" + entriesCache.length + " saved)" : " saved");
   box.innerHTML = pageEntries.map(function (e) {
-    var sub = [e.year, e.category, e.level, e.result].filter(Boolean).join(" · ");
+    var sub = [achievementPeriod(e), e.category, e.level, e.result].filter(Boolean).join(" · ");
     return '<div class="entry-row">' +
       '<div class="entry-row-main"><strong>' + esc(e.title) + '</strong>' +
       '<span class="muted small">' + esc(e.recordId) + (sub ? " · " + esc(sub) : "") + '</span></div>' +

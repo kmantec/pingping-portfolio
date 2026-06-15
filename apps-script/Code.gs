@@ -1,7 +1,7 @@
 /* =====================================================================
    Pingping Portfolio — BACKEND (Google Apps Script Web App)
    ---------------------------------------------------------------------
-   Runs as piraya.portfolio@gmail.com. Reads/writes the 24-column Google
+   Runs as piraya.portfolio@gmail.com. Reads/writes the 25-column Google
    Sheet and uploads certificate files to a Drive folder.
    Actions: verify, get/save profile, list, add, update, delete.
    Deploy: Deploy > New deployment > Web app
@@ -28,7 +28,7 @@ var FAMILY_ROLES = {
 
 // Exact column order of the sheet (must match row 1).
 var HEADERS = [
-  "Record ID", "Year", "Age", "Grade", "School", "Category",
+  "Record ID", "Year", "Month", "Age", "Grade", "School", "Category",
   "Activity / Competition Name", "Organizer", "Level", "Result / Award",
   "Score / Rank", "Participation Type", "Frequency", "Duration", "Role",
   "Evidence Type", "Evidence Link (Drive / YouTube)", "Student Reflection",
@@ -48,6 +48,21 @@ function ensureAchievementSchema_(sh) {
   var current = sh.getRange(1, 1, 1, lastColumn).getValues()[0].map(function (value) {
     return String(value || "").trim();
   });
+
+  // Month was added after Year. Insert the whole column so every existing
+  // value moves with its original header and no record data is overwritten.
+  var yearIndex = current.indexOf("Year");
+  if (current.indexOf("Month") < 0 && yearIndex >= 0) {
+    sh.insertColumnAfter(yearIndex + 1);
+    sh.getRange(1, yearIndex + 2).setValue("Month");
+    if (sh.getMaxRows() > 1) {
+      sh.getRange(2, yearIndex + 2, sh.getMaxRows() - 1, 1).clearDataValidations();
+    }
+    lastColumn = Math.max(sh.getLastColumn(), 1);
+    current = sh.getRange(1, 1, 1, lastColumn).getValues()[0].map(function (value) {
+      return String(value || "").trim();
+    });
+  }
   var legacyParent = current.indexOf("Parent Note");
   var dadMemory = current.indexOf("Dad's Memory");
   var momMemory = current.indexOf("Mom's Memory");
@@ -221,11 +236,11 @@ function uploadFiles_(files) {
   return links;
 }
 
-// Build a full row (24 cells) in HEADERS order.
+// Build a full row (25 cells) in HEADERS order.
 function buildRow_(data, recordId, evidence, editorRole) {
   return [
     recordId,
-    data.year || "", data.age || "", data.grade || "", data.school || "",
+    data.year || "", data.month || "", data.age || "", data.grade || "", data.school || "",
     data.category || "", data.title || "", data.organizer || "", data.level || "",
     data.result || "", data.rank || "", data.participationType || "",
     data.frequency || "", data.duration || "", data.role || "",
@@ -322,13 +337,13 @@ function listEntries_() {
   var last = sh.getLastRow();
   if (last < 2) return { ok: true, entries: [] };
   var values = sh.getRange(2, 1, last - 1, HEADERS.length).getValues();
-  var keys = ["recordId","year","age","grade","school","category","title","organizer","level",
+  var keys = ["recordId","year","month","age","grade","school","category","title","organizer","level",
               "result","rank","participationType","frequency","duration","role","evidenceType",
               "evidenceLink","reflection","dadNote","momNote","importance","useUniversity","notes","lastEditedBy"];
   var entries = [];
   values.forEach(function (row) {
-    if (!row[6] && !row[0]) return;            // skip fully empty
-    if (!String(row[6]).trim()) return;        // skip rows without an activity name
+    if (!row[7] && !row[0]) return;            // skip fully empty
+    if (!String(row[7]).trim()) return;        // skip rows without an activity name
     var o = {};
     keys.forEach(function (k, i) { o[k] = row[i] == null ? "" : String(row[i]); });
     entries.push(o);

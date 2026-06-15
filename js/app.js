@@ -1,7 +1,7 @@
 /* Pingping Portfolio — public view
    Reads the family Google Sheet (published/shared as CSV) configured in
    data/config.js (sheetCsvUrl). Falls back to data/portfolio.js sample.
-   Sheet columns (24): Record ID, Year, Age, Grade, School, Category,
+   Sheet columns (25): Record ID, Year, Month, Age, Grade, School, Category,
    Activity / Competition Name, Organizer, Level, Result / Award,
    Score / Rank, Participation Type, Frequency, Duration, Role,
    Evidence Type, Evidence Link (Drive / YouTube), Student Reflection,
@@ -35,6 +35,25 @@ function yearValue(v) {
   v = (v || "").toString();
   var m = v.match(/(\d{4})/);
   return m ? parseInt(m[1], 10) : 0;
+}
+function monthValue(v) {
+  var months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+  return months.indexOf(String(v || "").trim().toLowerCase()) + 1;
+}
+function entrySortValue(entry) {
+  var raw = String(entry.date || "").trim();
+  var year = yearValue(raw);
+  var month = monthValue(entry.month);
+  var day = 0;
+  if (!month && raw && !/^\d{4}$/.test(raw)) {
+    var parsed = new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw + "T00:00:00" : raw);
+    if (!isNaN(parsed)) { month = parsed.getMonth() + 1; day = parsed.getDate(); }
+  }
+  return year * 10000 + month * 100 + day;
+}
+function entryPeriod(entry) {
+  if (entry.month && yearValue(entry.date)) return entry.month + " " + yearValue(entry.date);
+  return fmtDate(entry.date);
 }
 function isYes(v) { return /^(y|yes|true|1|✓|core|use)/i.test((v || "").toString().trim()); }
 
@@ -171,6 +190,7 @@ function rowsToEntries(rows) {
     recordId: findCol(header, ["record id", "id"], ["record id"]),
     title:    findCol(header, ["title", "activity / competition name", "activity", "name"], ["activity", "competition"]),
     year:     findCol(header, ["year", "date"], ["year", "date"]),
+    month:    findCol(header, ["month"], ["month"]),
     age:      findCol(header, ["age"], ["age"]),
     grade:    findCol(header, ["grade"], ["grade"]),
     school:   findCol(header, ["school"], ["school"]),
@@ -207,7 +227,7 @@ function rowsToEntries(rows) {
     });
     out.push({
       recordId: g("recordId"), title: title, category: g("category"), level: g("level"),
-      date: g("year"), organizer: g("organizer"),
+      date: g("year"), month: g("month"), organizer: g("organizer"),
       result: g("result"), rank: g("rank"),
       grade: g("grade"), ageAtEvent: g("age"), school: g("school"),
       ptype: g("ptype"), frequency: g("freq"), duration: g("duration"), role: g("role"),
@@ -379,7 +399,7 @@ function catLabel(id) { for (var i = 0; i < CATEGORIES.length; i++) if (CATEGORI
 
 function visibleEntries() {
   var list = (state.data.entries || []).slice();
-  list.sort(function (a, b) { return yearValue(b.date) - yearValue(a.date); });
+  list.sort(function (a, b) { return entrySortValue(b) - entrySortValue(a); });
   return list.filter(function (e) {
     if (state.category !== "all" && e.category !== state.category) return false;
     if (state.level !== "all" && e.level !== state.level) return false;
@@ -391,7 +411,7 @@ function visibleEntries() {
       if (!entryYear || entryYear < currentYear - range + 1 || entryYear > currentYear) return false;
     }
     if (state.query) {
-      var hay = [e.date, e.title, e.organizer, e.result, e.rank, e.description, e.reflection, e.dadNote, e.momNote, e.parentNote, e.school, e.role, catLabel(e.category)].join(" ").toLowerCase();
+      var hay = [e.date, e.month, e.title, e.organizer, e.result, e.rank, e.description, e.reflection, e.dadNote, e.momNote, e.parentNote, e.school, e.role, catLabel(e.category)].join(" ").toLowerCase();
       if (hay.indexOf(state.query) < 0) return false;
     }
     return true;
@@ -499,7 +519,7 @@ function entryHTML(e) {
 
   return '<article class="entry lvl-' + esc(e.level || "x") + '">' +
     '<div class="entry-top"><h3 class="entry-title">' + esc(e.title) + '</h3>' +
-    '<span class="entry-date">' + esc(fmtDate(e.date)) + '</span></div>' +
+    '<span class="entry-date">' + esc(entryPeriod(e)) + '</span></div>' +
     '<div class="badges">' + badges + '</div>' +
     (e.organizer ? '<p class="entry-org">Organized by <strong>' + esc(e.organizer) + '</strong></p>' : "") +
     meta +
