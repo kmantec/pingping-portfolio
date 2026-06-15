@@ -282,6 +282,7 @@ html:not(.authenticated) body.protected-page > :not(.auth-gate) { visibility: hi
 /* ===== Schema-specific bits ===== */
 .badge.uni { background: #fbeffb; color: #8e2f8e; border: 1px solid #e9c7e9; }
 .entry-meta { margin: 8px 0 0; font-size: .82rem; color: var(--slate); }
+.entry-audit { margin: 13px 0 -6px; color: #9a8589; text-align: right; font-size: .68rem; font-style: italic; }
 .reflection { margin: 14px 0 0; padding: 12px 16px; border-left: 3px solid var(--blue); background: #f6f9ff; border-radius: 0 8px 8px 0; font-size: .92rem; color: #33415a; font-style: italic; }
 .reflection span { display: block; font-style: normal; font-weight: 700; font-size: .7rem; letter-spacing: .04em; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
 .parent-note { margin: 10px 0 0; padding: 10px 13px; font-size: .86rem; color: var(--slate); border-radius: 8px; background: #faf7f7; border-left: 3px solid #b95a62; }

@@ -71,12 +71,25 @@ function renderProfile(profile) {
   photo.onerror = function () { photo.style.display = "none"; };
 }
 
+function cardEvidenceLabel(label, kind) {
+  var text = String(label || "").trim().toLowerCase();
+  var types = ["Medal / Trophy", "Certificate", "Report Card", "Photo", "Document"];
+  for (var i = 0; i < types.length; i++) {
+    var type = types[i];
+    var lowerType = type.toLowerCase();
+    if (text === lowerType || text.indexOf(lowerType + " -") === 0) return type;
+  }
+  if (kind === "youtube") return "Video";
+  if (kind === "image") return "Photo";
+  return "Document";
+}
+
 function attachmentButton(attachment, index) {
   var cls = attachment.kind === "image" ? "img" : (attachment.kind === "youtube" ? "vid" : "pdf");
   var tag = attachment.kind === "image" ? "IMG" : (attachment.kind === "youtube" ? "VID" : (attachment.kind === "drive" ? "DOC" : "PDF"));
   var thumb = attachment.thumb ? '<span class="att-thumb"><img src="' + esc(attachment.thumb) + '" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'" /></span>' : "";
   return '<button class="att-btn' + (thumb ? " has-thumb" : "") + '" data-attachment="' + index + '">' + thumb +
-    '<span class="ic ' + cls + '">' + tag + '</span><span>' + esc(attachment.label) + '</span></button>';
+    '<span class="ic ' + cls + '">' + tag + '</span><span>' + esc(cardEvidenceLabel(attachment.label, attachment.kind)) + '</span></button>';
 }
 
 function renderEntry(entry) {
@@ -101,6 +114,7 @@ function renderEntry(entry) {
     (entry.reflection ? '<blockquote class="reflection"><span>Pingping’s memory</span>' + esc(entry.reflection) + '</blockquote>' : "") +
     ((entry.dadNote || entry.parentNote) ? '<p class="parent-note dad-note"><strong>Dad\'s memory:</strong> ' + esc(entry.dadNote || entry.parentNote) + '</p>' : "") +
     (entry.momNote ? '<p class="parent-note mom-note"><strong>Mom\'s memory:</strong> ' + esc(entry.momNote) + '</p>' : "") +
+    (entry.lastEditedBy ? '<p class="entry-audit">Last edited by ' + esc(entry.lastEditedBy) + '</p>' : "") +
     (attachmentHtml ? '<div class="attachments">' + attachmentHtml + '</div>' : "") + '</article>';
   $("#shareStatus").hidden = true;
   $$("[data-attachment]").forEach(function (button) {

@@ -1,7 +1,7 @@
 /* =====================================================================
    Pingping Portfolio — BACKEND (Google Apps Script Web App)
    ---------------------------------------------------------------------
-   Runs as piraya.portfolio@gmail.com. Reads/writes the 23-column Google
+   Runs as piraya.portfolio@gmail.com. Reads/writes the 24-column Google
    Sheet and uploads certificate files to a Drive folder.
    Actions: verify, get/save profile, list, add, update, delete.
    Deploy: Deploy > New deployment > Web app
@@ -32,7 +32,8 @@ var HEADERS = [
   "Activity / Competition Name", "Organizer", "Level", "Result / Award",
   "Score / Rank", "Participation Type", "Frequency", "Duration", "Role",
   "Evidence Type", "Evidence Link (Drive / YouTube)", "Student Reflection",
-  "Dad's Memory", "Mom's Memory", "Importance Level", "Use for University", "Notes"
+  "Dad's Memory", "Mom's Memory", "Importance Level", "Use for University", "Notes",
+  "Last Edited By"
 ];
 
 /* ---------------------------------------------------------------- */
@@ -74,6 +75,15 @@ function ensureAchievementSchema_(sh) {
       sh.insertColumnAfter(dadIndex + 1);
       sh.getRange(1, dadIndex + 2).setValue("Mom's Memory");
     }
+  }
+
+  // This audit column is appended at the end so existing records never shift.
+  var updatedLastColumn = Math.max(sh.getLastColumn(), 1);
+  var updatedHeaders = sh.getRange(1, 1, 1, updatedLastColumn).getValues()[0].map(function (value) {
+    return String(value || "").trim();
+  });
+  if (updatedHeaders.indexOf("Last Edited By") < 0) {
+    sh.getRange(1, HEADERS.length).setValue("Last Edited By");
   }
 }
 
@@ -211,8 +221,8 @@ function uploadFiles_(files) {
   return links;
 }
 
-// Build a full row (23 cells) in HEADERS order.
-function buildRow_(data, recordId, evidence) {
+// Build a full row (24 cells) in HEADERS order.
+function buildRow_(data, recordId, evidence, editorRole) {
   return [
     recordId,
     data.year || "", data.age || "", data.grade || "", data.school || "",
@@ -222,7 +232,8 @@ function buildRow_(data, recordId, evidence) {
     data.evidenceType || "", evidence, data.reflection || "",
     data.dadNote || data.parentNote || "", data.momNote || "",
     data.importance || "", data.useUniversity || "",
-    data.notes || ""
+    data.notes || "",
+    editorRole || data.lastEditedBy || ""
   ];
 }
 
@@ -313,7 +324,7 @@ function listEntries_() {
   var values = sh.getRange(2, 1, last - 1, HEADERS.length).getValues();
   var keys = ["recordId","year","age","grade","school","category","title","organizer","level",
               "result","rank","participationType","frequency","duration","role","evidenceType",
-              "evidenceLink","reflection","dadNote","momNote","importance","useUniversity","notes"];
+              "evidenceLink","reflection","dadNote","momNote","importance","useUniversity","notes","lastEditedBy"];
   var entries = [];
   values.forEach(function (row) {
     if (!row[6] && !row[0]) return;            // skip fully empty
@@ -341,7 +352,7 @@ function addEntry_(data, user) {
   var evidence = combineEvidence_(data.evidenceLink, newLinks);
   var sh = getSheet_();
   var recordId = "PP-" + pad4_(sh.getLastRow());     // header row 1 -> first data PP-0001
-  sh.appendRow(buildRow_(data, recordId, evidence));
+  sh.appendRow(buildRow_(data, recordId, evidence, user));
   return { ok: true, user: user, recordId: recordId, links: newLinks };
 }
 
@@ -353,7 +364,7 @@ function updateEntry_(data, user) {
   if (rowNum < 0) return { ok: false, error: "Record not found: " + data.recordId };
   var newLinks = uploadFiles_(data.files);
   var evidence = combineEvidence_(data.evidenceLink, newLinks);   // edited links + any new uploads
-  sh.getRange(rowNum, 1, 1, HEADERS.length).setValues([buildRow_(data, data.recordId, evidence)]);
+  sh.getRange(rowNum, 1, 1, HEADERS.length).setValues([buildRow_(data, data.recordId, evidence, user)]);
   return { ok: true, user: user, recordId: data.recordId, updated: true };
 }
 

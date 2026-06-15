@@ -2,10 +2,10 @@
 
 ส่วนที่ผมทำให้แล้ว ✅
 - สร้างโฟลเดอร์ Drive **"Pingping Certificates"** (เก็บไฟล์ใบ Certificate)
-- ใช้ Google Sheetเดิมของคุณ **"Pingping_Portfolio"** (23 คอลัมน์) เป็นฐานข้อมูล
+- ใช้ Google Sheetเดิมของคุณ **"Pingping_Portfolio"** (24 คอลัมน์) เป็นฐานข้อมูล
 - ใส่ Sheet ID + Folder ID ลงใน `apps-script/Code.gs` ให้แล้ว
 - ใส่ลิงก์อ่านข้อมูล (CSV) ลงใน `data/config.js` ให้แล้ว
-- ปรับหน้าเว็บ + ฟอร์ม + backend ให้ตรงกับ 23 คอลัมน์ของคุณ
+- ปรับหน้าเว็บ + ฟอร์ม + backend ให้ตรงกับ 24 คอลัมน์ของคุณ
 
 > ID ที่ใช้ — Sheet: `11HwCxqYSK96hCXnqKzftd1dqphJ_t04VmVcY39Fwih8` · Folder: `13quDAcUu8dpJoWYxUp1ZtzC4XWOvBbil`
 

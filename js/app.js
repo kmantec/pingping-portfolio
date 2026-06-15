@@ -1,11 +1,12 @@
 /* Pingping Portfolio — public view
    Reads the family Google Sheet (published/shared as CSV) configured in
    data/config.js (sheetCsvUrl). Falls back to data/portfolio.js sample.
-   Sheet columns (23): Record ID, Year, Age, Grade, School, Category,
+   Sheet columns (24): Record ID, Year, Age, Grade, School, Category,
    Activity / Competition Name, Organizer, Level, Result / Award,
    Score / Rank, Participation Type, Frequency, Duration, Role,
    Evidence Type, Evidence Link (Drive / YouTube), Student Reflection,
-   Dad's Memory, Mom's Memory, Importance Level, Use for University, Notes.
+   Dad's Memory, Mom's Memory, Importance Level, Use for University, Notes,
+   Last Edited By.
    Evidence links may be Google Drive or YouTube; shown live in-page. */
 
 var CATEGORIES = [
@@ -106,6 +107,19 @@ function evidenceValue(value, fallbackLabel) {
   return { url: named[2].trim(), label: label || fallbackLabel };
 }
 
+function cardEvidenceLabel(label, kind) {
+  var text = String(label || "").trim().toLowerCase();
+  var types = ["Medal / Trophy", "Certificate", "Report Card", "Photo", "Document"];
+  for (var i = 0; i < types.length; i++) {
+    var type = types[i];
+    var lowerType = type.toLowerCase();
+    if (text === lowerType || text.indexOf(lowerType + " -") === 0) return type;
+  }
+  if (kind === "youtube") return "Video";
+  if (kind === "image") return "Photo";
+  return "Document";
+}
+
 function normalizeEntry(e) {
   e.category = normCategory(e.category);
   if (Array.isArray(e.attachments)) {
@@ -177,7 +191,8 @@ function rowsToEntries(rows) {
     parent:   findCol(header, ["parent note"], ["parent"]),
     importance:findCol(header, ["importance level", "importance"], ["importance"]),
     uni:      findCol(header, ["use for university"], ["university"]),
-    notes:    findCol(header, ["notes"], ["notes", "note"])
+    notes:    findCol(header, ["notes"], ["notes", "note"]),
+    editor:   findCol(header, ["last edited by", "edited by"], ["last edited", "edited by"])
   };
   var out = [];
   for (var r = 1; r < rows.length; r++) {
@@ -199,6 +214,7 @@ function rowsToEntries(rows) {
       evidenceType: g("etype"), reflection: g("reflection"),
       dadNote: g("dad") || g("parent"), momNote: g("mom"),
       importance: g("importance"), useUni: g("uni"), description: g("notes"),
+      lastEditedBy: g("editor"),
       attachments: atts
     });
   }
@@ -477,7 +493,7 @@ function entryHTML(e) {
     var cls = a.kind === "image" ? "img" : (a.kind === "youtube" ? "vid" : "pdf");
     var tag = a.kind === "image" ? "IMG" : (a.kind === "youtube" ? "VID" : (a.kind === "drive" ? "DOC" : "PDF"));
     var thumb = a.thumb ? '<span class="att-thumb"><img src="' + esc(a.thumb) + '" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'" /></span>' : "";
-    return '<button class="att-btn' + (thumb ? " has-thumb" : "") + '" data-e="' + ei + '" data-i="' + i + '">' + thumb + '<span class="ic ' + cls + '">' + tag + '</span><span>' + esc(a.label || "View evidence") + '</span></button>';
+    return '<button class="att-btn' + (thumb ? " has-thumb" : "") + '" data-e="' + ei + '" data-i="' + i + '">' + thumb + '<span class="ic ' + cls + '">' + tag + '</span><span>' + esc(cardEvidenceLabel(a.label, a.kind)) + '</span></button>';
   }).join("");
   var share = e.recordId ? '<button class="att-btn share-entry-btn" type="button" data-share-entry="' + ei + '"><span class="share-symbol">↗</span><span>Share</span></button>' : "";
 
@@ -491,6 +507,7 @@ function entryHTML(e) {
     (e.reflection ? '<blockquote class="reflection"><span>Pingping’s memory</span>' + esc(e.reflection) + '</blockquote>' : "") +
     ((e.dadNote || e.parentNote) ? '<p class="parent-note dad-note"><strong>Dad\'s memory:</strong> ' + esc(e.dadNote || e.parentNote) + '</p>' : "") +
     (e.momNote ? '<p class="parent-note mom-note"><strong>Mom\'s memory:</strong> ' + esc(e.momNote) + '</p>' : "") +
+    (e.lastEditedBy ? '<p class="entry-audit">Last edited by ' + esc(e.lastEditedBy) + '</p>' : "") +
     ((atts || share) ? '<div class="attachments">' + atts + share + '</div>' : "") +
     '</article>';
 }
