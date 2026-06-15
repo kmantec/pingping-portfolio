@@ -82,13 +82,14 @@
         <div class="field">
           <label for="f-category">Category <span class="req">*</span></label>
           <select id="f-category">
-            <option>Math &amp; Science</option><option>Language</option>
+            <option value="">— Select category —</option>
+            <option>Math</option><option>Science</option><option>Language</option>
             <option>Arts &amp; Music</option><option>Other</option>
           </select>
         </div>
         <div class="field">
           <label for="f-year">Year <span class="req">*</span></label>
-          <input id="f-year" type="number" min="2000" max="2100" placeholder="e.g. 2026" inputmode="numeric" />
+          <select id="f-year"><option value="">— Select year —</option></select>
         </div>
         <div class="field">
           <label for="f-level">Level</label>
@@ -126,6 +127,11 @@
           <div id="pendingFileList" class="pending-file-list"></div>
           <p id="fileSelectionHint" class="field-hint">Video files are not accepted. Add a YouTube or video link below instead.</p>
         </div>
+        <div id="savedEvidenceField" class="field span2" hidden>
+          <label>Currently attached <span class="muted">(remove individual files or links)</span></label>
+          <div id="savedEvidenceList" class="saved-evidence-list"></div>
+          <p class="field-hint">Removed items disappear from this achievement after Save changes. Original uploaded files remain safely in Google Drive.</p>
+        </div>
         <div class="field span2">
           <label for="f-evlink">Evidence and video links <span class="muted">(one per line — Google Drive or YouTube)</span></label>
           <textarea id="f-evlink" rows="2" placeholder="https://youtu.be/…&#10;https://drive.google.com/…"></textarea>
@@ -160,7 +166,7 @@
         <option value="Champion"></option><option value="Winner"></option>
         <option value="1st Runner-up"></option><option value="2nd Runner-up"></option>
         <option value="Finalist"></option><option value="Certificate of Achievement"></option>
-        <option value="Participant"></option>
+        <option value="Participant"></option><option value="Report Card"></option>
       </datalist>
       <datalist id="organizer-options"></datalist>
       <datalist id="grade-options">

@@ -10,7 +10,7 @@ window.PORTFOLIO_DATA = {
   "entries": [
     {
       "title": "National Mathematics Olympiad",
-      "category": "Math & Science",
+      "category": "Math",
       "level": "National",
       "date": "2024-08-15",
       "ageAtEvent": 14,
@@ -26,7 +26,7 @@ window.PORTFOLIO_DATA = {
     },
     {
       "title": "Regional Science Fair",
-      "category": "Math & Science",
+      "category": "Science",
       "level": "Regional",
       "date": "2023-11-20",
       "ageAtEvent": 13,

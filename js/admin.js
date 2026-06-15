@@ -76,6 +76,65 @@ var SUGGESTION_FIELDS = {
   "duration-options": "duration"
 };
 
+function populateYearOptions(selected) {
+  var select = $("#f-year");
+  if (!select) return;
+  var currentYear = new Date().getFullYear();
+  var latestYear = currentYear + 1;
+  var value = String(selected || "");
+  select.innerHTML = '<option value="">— Select year —</option>';
+  for (var year = latestYear; year >= 2010; year--) {
+    var option = document.createElement("option");
+    option.value = String(year);
+    option.textContent = String(year);
+    select.appendChild(option);
+  }
+  select.value = value;
+}
+
+function splitEvidenceLines(value) {
+  return String(value || "").split(/\n+|;\s*(?=https?:)|,\s*(?=https?:)/i).map(function (line) {
+    return line.trim();
+  }).filter(Boolean);
+}
+
+function evidenceLineInfo(line) {
+  var named = String(line || "").match(/^(.*?)\s*\|\s*(https?:\/\/.*)$/i);
+  var label = named ? named[1].trim() : "Linked evidence";
+  var url = named ? named[2].trim() : String(line || "").trim();
+  if (!named) {
+    try { label = new URL(url).hostname.replace(/^www\./, ""); }
+    catch (ignore) {}
+  }
+  return { label: label || "Evidence", url: url };
+}
+
+function renderSavedEvidence() {
+  var field = $("#savedEvidenceField");
+  var list = $("#savedEvidenceList");
+  if (!field || !list) return;
+  var lines = splitEvidenceLines(val("#f-evlink"));
+  field.hidden = !editingId || !lines.length;
+  if (field.hidden) { list.innerHTML = ""; return; }
+  list.innerHTML = lines.map(function (line, index) {
+    var item = evidenceLineInfo(line);
+    return '<div class="saved-evidence-item">' +
+      '<div class="saved-evidence-info"><strong>' + esc(item.label) + '</strong>' +
+      '<span title="' + esc(item.url) + '">' + esc(item.url) + '</span></div>' +
+      '<button type="button" class="mini danger" data-remove-saved-evidence="' + index + '">Remove</button>' +
+      '</div>';
+  }).join("");
+}
+
+function removeSavedEvidence(index) {
+  var lines = splitEvidenceLines(val("#f-evlink"));
+  if (index < 0 || index >= lines.length) return;
+  lines.splice(index, 1);
+  setVal("#f-evlink", lines.join("\n"));
+  renderSavedEvidence();
+  setMsg($("#formMsg"), "Attachment removed from this achievement. Click Save changes to confirm.", "");
+}
+
 function refreshSuggestions() {
   for (var listId in SUGGESTION_FIELDS) {
     var list = document.getElementById(listId);
@@ -416,13 +475,19 @@ function startEdit(rid) {
   editingId = rid;
   pendingFiles = [];
   baseEvidenceType = e.evidenceType || "";
+  populateYearOptions(e.year);
   for (var k in FIELD_IDS) setVal(FIELD_IDS[k], e[k]);
   if (!e.dadNote && e.parentNote) setVal("#f-dad-note", e.parentNote);
+  var legacyCategory = e.category === "Math & Science";
+  if (legacyCategory) setVal("#f-category", "");
   renderPendingFiles();
+  renderSavedEvidence();
   $("#formTitle").textContent = "Edit achievement (" + rid + ")";
   $("#submitBtn").textContent = "Save changes";
   $("#cancelBtn").hidden = false;
-  setMsg($("#formMsg"), "Editing " + rid + ". Uploading new files will be ADDED to the existing links.", "");
+  setMsg($("#formMsg"), legacyCategory
+    ? "This older record used Math & Science. Please choose Math or Science before saving."
+    : "Editing " + rid + ". Remove existing attachments individually or add new files.", "");
   try { var fc = $("#formCard"); if (fc.scrollIntoView) fc.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
 }
 
@@ -485,7 +550,9 @@ function clearForm(keepCategory) {
   var f = $("#f-files"); if (f) f.value = "";
   pendingFiles = [];
   baseEvidenceType = "";
+  populateYearOptions(new Date().getFullYear());
   renderPendingFiles();
+  renderSavedEvidence();
   var hint = $("#fileSelectionHint");
   if (hint) hint.textContent = "Video files are not accepted. Add a YouTube or video link below instead.";
 }
@@ -502,6 +569,7 @@ function doLogout() {
 }
 
 function initAdmin() {
+  populateYearOptions(new Date().getFullYear());
   $("#loginBtn").addEventListener("click", doLogin);
   $("#passcode").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
   $("#submitBtn").addEventListener("click", doSubmit);
@@ -580,6 +648,12 @@ function initAdmin() {
     renderPendingFiles();
     $("#fileSelectionHint").textContent = pendingFiles.length ? pendingFiles.length + " file(s) ready to upload." : "Video files are not accepted. Add a YouTube or video link below instead.";
   });
+  $("#savedEvidenceList").addEventListener("click", function (e) {
+    var button = e.target.closest ? e.target.closest("[data-remove-saved-evidence]") : null;
+    if (!button) return;
+    removeSavedEvidence(Number(button.getAttribute("data-remove-saved-evidence")));
+  });
+  $("#f-evlink").addEventListener("input", function () { if (editingId) renderSavedEvidence(); });
   renderPendingFiles();
   try {
     var p = sessionStorage.getItem("pp_pass"), u = sessionStorage.getItem("pp_user"), email = sessionStorage.getItem("pp_email");

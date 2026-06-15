@@ -1,7 +1,7 @@
 /* Pingping Portfolio — public view
    Reads the family Google Sheet (published/shared as CSV) configured in
    data/config.js (sheetCsvUrl). Falls back to data/portfolio.js sample.
-   Sheet columns (22): Record ID, Year, Age, Grade, School, Category,
+   Sheet columns (23): Record ID, Year, Age, Grade, School, Category,
    Activity / Competition Name, Organizer, Level, Result / Award,
    Score / Rank, Participation Type, Frequency, Duration, Role,
    Evidence Type, Evidence Link (Drive / YouTube), Student Reflection,
@@ -9,7 +9,8 @@
    Evidence links may be Google Drive or YouTube; shown live in-page. */
 
 var CATEGORIES = [
-  { id: "science",  label: "Math & Science" },
+  { id: "math",     label: "Math" },
+  { id: "science",  label: "Science" },
   { id: "language", label: "Language" },
   { id: "arts",     label: "Arts & Music" },
   { id: "other",    label: "Other" }
@@ -43,7 +44,9 @@ function normCategory(v) {
   for (var i = 0; i < CATEGORIES.length; i++) {
     if (v === CATEGORIES[i].id || v === CATEGORIES[i].label.toLowerCase()) return CATEGORIES[i].id;
   }
-  if (/math|science|sci|stem|coding|robot/.test(v)) return "science";
+  if (v === "math & science") return "math"; // legacy records were predominantly mathematics
+  if (/math|algebra|geometry|number theory/.test(v)) return "math";
+  if (/science|sci|stem|coding|robot/.test(v)) return "science";
   if (/lang|english|speak|writ|debate|spell/.test(v)) return "language";
   if (/art|music|piano|draw|paint|danc|sing|choir/.test(v)) return "arts";
   return "other";
@@ -372,7 +375,7 @@ function visibleEntries() {
       if (!entryYear || entryYear < currentYear - range + 1 || entryYear > currentYear) return false;
     }
     if (state.query) {
-      var hay = [e.title, e.organizer, e.result, e.rank, e.description, e.reflection, e.dadNote, e.momNote, e.parentNote, e.school, e.role, catLabel(e.category)].join(" ").toLowerCase();
+      var hay = [e.date, e.title, e.organizer, e.result, e.rank, e.description, e.reflection, e.dadNote, e.momNote, e.parentNote, e.school, e.role, catLabel(e.category)].join(" ").toLowerCase();
       if (hay.indexOf(state.query) < 0) return false;
     }
     return true;
