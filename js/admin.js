@@ -76,6 +76,38 @@ var SUGGESTION_FIELDS = {
   "duration-options": "duration"
 };
 
+function isAuthorizationError(response) {
+  return Boolean(response && !response.ok && /invalid family passcode|google account/i.test(response.error || ""));
+}
+
+function clearSavedAdminSession() {
+  try {
+    sessionStorage.removeItem("pp_pass");
+    sessionStorage.removeItem("pp_user");
+    sessionStorage.removeItem("pp_email");
+  } catch (ignore) {}
+}
+
+function showAdminLogin(message) {
+  session = { passcode: "", user: "", email: "" };
+  editingId = "";
+  entriesCache = [];
+  clearSavedAdminSession();
+  $("#profileCard").hidden = true;
+  $("#formCard").hidden = true;
+  $("#listCard").hidden = true;
+  $("#loginCard").hidden = false;
+  $("#passcode").value = "";
+  setMsg($("#loginMsg"), message || "", message ? "err" : "");
+  if (message) $("#passcode").focus();
+}
+
+function handleAuthorizationError(response) {
+  if (!isAuthorizationError(response)) return false;
+  showAdminLogin("Your saved family passcode is no longer accepted. Please enter the current passcode again.");
+  return true;
+}
+
 function populateYearOptions(selected) {
   var select = $("#f-year");
   if (!select) return;
@@ -269,6 +301,7 @@ function loadProfile() {
   setMsg($("#profileMsg"), "Loading profile…", "");
   callScript({ action: "getProfile", passcode: session.passcode })
     .then(function (res) {
+      if (handleAuthorizationError(res)) return;
       if (!res || !res.ok) throw new Error((res && res.error) || "Could not load profile");
       renderProfileEditor(res.profile || {});
       setMsg($("#profileMsg"), "", "");
@@ -392,6 +425,7 @@ function loadList() {
   $("#listMsg").textContent = "Loading…";
   callScript({ action: "list", passcode: session.passcode })
     .then(function (res) {
+      if (handleAuthorizationError(res)) return;
       if (!res || !res.ok) { $("#listMsg").textContent = "Could not load list: " + ((res && res.error) || "error"); return; }
       entriesCache = res.entries || [];
       refreshSuggestions();
@@ -558,14 +592,33 @@ function clearForm(keepCategory) {
 }
 
 function doLogout() {
-  session = { passcode: "", user: "", email: "" }; editingId = ""; entriesCache = [];
+  showAdminLogin("");
+}
+
+function restoreAdminSession() {
+  var p = "", u = "", email = "";
   try {
-    sessionStorage.removeItem("pp_pass");
-    sessionStorage.removeItem("pp_user");
-    sessionStorage.removeItem("pp_email");
-  } catch (e) {}
-  $("#profileCard").hidden = true; $("#formCard").hidden = true; $("#listCard").hidden = true; $("#loginCard").hidden = false;
-  $("#passcode").value = ""; setMsg($("#loginMsg"), "", "");
+    p = sessionStorage.getItem("pp_pass") || "";
+    u = sessionStorage.getItem("pp_user") || "";
+    email = sessionStorage.getItem("pp_email") || "";
+  } catch (ignore) {}
+  if (!p || !u) return;
+
+  setMsg($("#loginMsg"), "Checking saved family access…", "");
+  callScript({ action: "verify", passcode: p })
+    .then(function (res) {
+      if (!res || !res.ok) {
+        showAdminLogin("Your saved family passcode is no longer accepted. Please enter the current passcode again.");
+        return;
+      }
+      session.passcode = p;
+      session.user = res.user || u;
+      session.email = res.email || email;
+      showForm();
+    })
+    .catch(function (error) {
+      showAdminLogin("Could not verify saved access. Please sign in again. " + error.message);
+    });
 }
 
 function initAdmin() {
@@ -655,10 +708,7 @@ function initAdmin() {
   });
   $("#f-evlink").addEventListener("input", function () { if (editingId) renderSavedEvidence(); });
   renderPendingFiles();
-  try {
-    var p = sessionStorage.getItem("pp_pass"), u = sessionStorage.getItem("pp_user"), email = sessionStorage.getItem("pp_email");
-    if (p && u) { session.passcode = p; session.user = u; session.email = email || ""; showForm(); }
-  } catch (e) {}
+  restoreAdminSession();
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAdmin);
 else initAdmin();
