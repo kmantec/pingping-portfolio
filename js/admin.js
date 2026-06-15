@@ -34,7 +34,24 @@ function readFile(item) {
 }
 
 function val(id) { var el = $(id); return el ? el.value.trim() : ""; }
-function setVal(id, v) { var el = $(id); if (el) el.value = v || ""; }
+function setVal(id, v) {
+  var el = $(id);
+  if (!el) return;
+
+  var nextValue = v || "";
+  if (el.tagName === "SELECT" && nextValue) {
+    var hasOption = Array.prototype.some.call(el.options, function (option) {
+      return option.value === nextValue;
+    });
+    if (!hasOption) {
+      var legacyOption = document.createElement("option");
+      legacyOption.value = nextValue;
+      legacyOption.textContent = nextValue + " (existing)";
+      el.appendChild(legacyOption);
+    }
+  }
+  el.value = nextValue;
+}
 
 var FIELD_IDS = {
   title: "#f-title", category: "#f-category", year: "#f-year", month: "#f-month", level: "#f-level",
@@ -67,7 +84,6 @@ var EVIDENCE_FILE_TYPES = ["Certificate", "Medal / Trophy", "Photo", "Document"]
 var profileState = { photo: "", file: null, previewUrl: "" };
 var profileLoaded = false;
 var SUGGESTION_FIELDS = {
-  "level-options": "level",
   "result-options": "result",
   "organizer-options": "organizer",
   "grade-options": "grade",

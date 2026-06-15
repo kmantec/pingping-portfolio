@@ -126,7 +126,16 @@
         </div>
         <div class="field">
           <label for="f-level">Level</label>
-          <input id="f-level" list="level-options" placeholder="Select or type a level" />
+          <select id="f-level">
+            <option value="">— Select level —</option>
+            <option value="International">International</option>
+            <option value="National">National</option>
+            <option value="Regional">Regional</option>
+            <option value="Provincial">Provincial</option>
+            <option value="Local">Local</option>
+            <option value="School">School</option>
+            <option value="Online">Online</option>
+          </select>
         </div>
         <div class="field"><label for="f-result">Result / Award</label><input id="f-result" list="result-options" placeholder="Select or type an award" /></div>
         <div class="field"><label for="f-rank">Score / Rank</label><input id="f-rank" placeholder="e.g. 1st of 480, 98/100" /></div>
@@ -187,11 +196,6 @@
         </div>
       </div>
 
-      <datalist id="level-options">
-        <option value="International"></option><option value="National"></option>
-        <option value="Regional"></option><option value="Provincial"></option>
-        <option value="Local"></option><option value="School"></option><option value="Online"></option>
-      </datalist>
       <datalist id="result-options">
         <option value="Gold Award"></option><option value="Gold Medal"></option>
         <option value="Silver Award"></option><option value="Silver Medal"></option>

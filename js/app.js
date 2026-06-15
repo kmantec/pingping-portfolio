@@ -196,7 +196,7 @@ function rowsToEntries(rows) {
     school:   findCol(header, ["school"], ["school"]),
     category: findCol(header, ["category"], ["category"]),
     organizer:findCol(header, ["organizer", "organiser"], ["organiz", "organis"]),
-    level:    findCol(header, ["level"], []),
+    level:    findCol(header, ["level"], ["level"]),
     result:   findCol(header, ["result / award", "result", "award"], ["result", "award"]),
     rank:     findCol(header, ["score / rank", "score", "rank"], ["score", "rank"]),
     ptype:    findCol(header, ["participation type"], ["participation"]),
@@ -327,13 +327,12 @@ function renderStats() {
   var entries = state.data.entries || [];
   var golds = entries.filter(function (e) { return /gold|champion|1st|first|winner/i.test((e.result || "") + (e.rank || "")); }).length;
   var intl = entries.filter(function (e) { return /international|national/i.test(e.level || ""); }).length;
-  var uni = entries.filter(function (e) { return isYes(e.useUni); }).length;
   var years = entries.map(function (e) { return yearValue(e.date); }).filter(function (y) { return y > 1900; });
   var span = years.length ? (Math.max.apply(null, years) - Math.min.apply(null, years) + 1) : 0;
   var stats = [
     { num: entries.length, label: "Total Achievements" },
     { num: golds, label: "Top / Gold Honors" },
-    { num: uni || intl, label: uni ? "Featured Highlights" : "National & International" },
+    { num: intl, label: "National & International" },
     { num: span, label: "Years Documented" }
   ];
   $("#statsGrid").innerHTML = stats.map(function (s) {
