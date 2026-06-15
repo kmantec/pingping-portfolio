@@ -38,13 +38,37 @@
       <p id="loginMsg" class="form-msg"></p>
     </section>
 
+    <!-- FAMILY DASHBOARD NAVIGATION -->
+    <section id="dashboardNav" class="admin-dashboard" hidden>
+      <div class="admin-dashboard-welcome">
+        <div>
+          <p class="dashboard-eyebrow">Family workspace</p>
+          <h2>Manage Pingping's portfolio</h2>
+        </div>
+        <p class="dashboard-user">Signed in as <strong id="dashboardWho"></strong> · <a href="#" id="logout">Family log out</a></p>
+      </div>
+      <nav class="admin-tabs" aria-label="Family admin sections">
+        <button type="button" class="admin-tab active" data-admin-view="achievements" aria-selected="true">
+          <span class="admin-tab-icon">01</span><span><strong>Achievements</strong><small>Search, edit, and delete</small></span>
+        </button>
+        <button type="button" class="admin-tab" data-admin-view="add" aria-selected="false">
+          <span class="admin-tab-icon">+</span><span><strong>Add Achievement</strong><small>Create a new record</small></span>
+        </button>
+        <button type="button" class="admin-tab" data-admin-view="profile" aria-selected="false">
+          <span class="admin-tab-icon">P</span><span><strong>Edit Profile</strong><small>Photo and introduction</small></span>
+        </button>
+      </nav>
+      <p id="dashboardNotice" class="dashboard-notice" hidden></p>
+    </section>
+
     <!-- MINI PROFILE -->
     <section id="profileCard" class="card" hidden>
       <div class="form-head">
         <div>
-          <h2 class="card-title">Mini profile</h2>
+          <h2 class="card-title">Edit profile</h2>
           <p class="muted small">Update the introduction shown at the top of the portfolio.</p>
         </div>
+        <button id="closeProfileBtn" type="button" class="mini">Back to achievements</button>
       </div>
       <div class="profile-editor">
         <div class="profile-photo-editor">
@@ -70,7 +94,7 @@
     <section id="formCard" class="card" hidden>
       <div class="form-head">
         <h2 class="card-title" id="formTitle">Add achievement</h2>
-        <p class="muted small">Signed in as <strong id="who"></strong>. <a href="#" id="logout">Log out</a></p>
+        <p class="muted small">Signed in as <strong id="who"></strong></p>
       </div>
 
       <h3 class="group-title">Basics</h3>
@@ -191,7 +215,7 @@
 
       <div class="form-actions">
         <button id="submitBtn" class="btn-primary">Save achievement</button>
-        <button id="cancelBtn" class="btn-ghost-2" hidden>Cancel edit</button>
+        <button id="cancelBtn" class="btn-ghost-2">Back to achievements</button>
       </div>
       <p id="formMsg" class="form-msg"></p>
     </section>
@@ -199,8 +223,14 @@
     <!-- SAVED ENTRIES -->
     <section id="listCard" class="card" hidden>
       <div class="form-head">
-        <h2 class="card-title">Saved achievements</h2>
-        <a href="#" id="refreshList" class="small">↻ Refresh</a>
+        <div>
+          <h2 class="card-title">Achievements</h2>
+          <p class="muted small">Browse and manage every saved record.</p>
+        </div>
+        <div class="list-head-actions">
+          <a href="#" id="refreshList" class="small">↻ Refresh</a>
+          <button id="listAddAchievement" type="button" class="mini dashboard-add-btn">+ Add achievement</button>
+        </div>
       </div>
       <div id="listTools" class="admin-list-tools" hidden>
         <div class="field list-search-field">

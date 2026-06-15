@@ -65,6 +65,7 @@ var pendingFileSequence = 1;
 var baseEvidenceType = "";
 var EVIDENCE_FILE_TYPES = ["Certificate", "Medal / Trophy", "Photo", "Document"];
 var profileState = { photo: "", file: null, previewUrl: "" };
+var profileLoaded = false;
 var SUGGESTION_FIELDS = {
   "level-options": "level",
   "result-options": "result",
@@ -92,7 +93,9 @@ function showAdminLogin(message) {
   session = { passcode: "", user: "", email: "" };
   editingId = "";
   entriesCache = [];
+  profileLoaded = false;
   clearSavedAdminSession();
+  $("#dashboardNav").hidden = true;
   $("#profileCard").hidden = true;
   $("#formCard").hidden = true;
   $("#listCard").hidden = true;
@@ -106,6 +109,44 @@ function handleAuthorizationError(response) {
   if (!isAuthorizationError(response)) return false;
   showAdminLogin("Your saved family passcode is no longer accepted. Please enter the current passcode again.");
   return true;
+}
+
+function setDashboardNotice(message, type) {
+  var notice = $("#dashboardNotice");
+  if (!notice) return;
+  notice.textContent = message || "";
+  notice.className = "dashboard-notice" + (type ? " " + type : "");
+  notice.hidden = !message;
+}
+
+function showDashboardView(view) {
+  view = view === "profile" || view === "add" ? view : "achievements";
+  $("#dashboardNav").hidden = false;
+  $("#profileCard").hidden = view !== "profile";
+  $("#formCard").hidden = view !== "add";
+  $("#listCard").hidden = view !== "achievements";
+  document.querySelectorAll("[data-admin-view]").forEach(function (button) {
+    var active = button.getAttribute("data-admin-view") === view;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  if (view === "profile" && !profileLoaded) loadProfile();
+  try { $("#dashboardNav").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (ignore) {}
+}
+
+function resetAchievementEditor() {
+  editingId = "";
+  clearForm(false);
+  $("#formTitle").textContent = "Add achievement";
+  $("#submitBtn").textContent = "Save achievement";
+  $("#cancelBtn").hidden = false;
+  setMsg($("#formMsg"), "", "");
+}
+
+function openAddAchievement() {
+  resetAchievementEditor();
+  setDashboardNotice("", "");
+  showDashboardView("add");
 }
 
 function populateYearOptions(selected) {
@@ -304,6 +345,7 @@ function loadProfile() {
       if (handleAuthorizationError(res)) return;
       if (!res || !res.ok) throw new Error((res && res.error) || "Could not load profile");
       renderProfileEditor(res.profile || {});
+      profileLoaded = true;
       setMsg($("#profileMsg"), "", "");
     })
     .catch(function (error) {
@@ -334,9 +376,12 @@ function saveProfile() {
     });
   }).then(function (res) {
     $("#saveProfileBtn").disabled = false;
+    if (handleAuthorizationError(res)) return;
     if (!res || !res.ok) throw new Error((res && res.error) || "Could not save profile");
     renderProfileEditor(res.profile || {});
-    setMsg($("#profileMsg"), "✓ Profile saved. Refresh View Portfolio to see the update.", "ok");
+    profileLoaded = true;
+    setDashboardNotice("Profile updated successfully.", "ok");
+    showDashboardView("achievements");
   }).catch(function (error) {
     $("#saveProfileBtn").disabled = false;
     setMsg($("#profileMsg"), "Could not save profile: " + error.message, "err");
@@ -392,11 +437,11 @@ function filteredEntries() {
 
 function showForm() {
   $("#loginCard").hidden = true;
-  $("#profileCard").hidden = false;
-  $("#formCard").hidden = false;
-  $("#listCard").hidden = false;
-  $("#who").textContent = session.user + (session.email ? " (" + session.email + ")" : "");
-  loadProfile();
+  var identity = session.user + (session.email ? " (" + session.email + ")" : "");
+  $("#who").textContent = identity;
+  $("#dashboardWho").textContent = identity;
+  setDashboardNotice("", "");
+  showDashboardView("achievements");
   loadList();
 }
 
@@ -522,16 +567,13 @@ function startEdit(rid) {
   setMsg($("#formMsg"), legacyCategory
     ? "This older record used Math & Science. Please choose Math or Science before saving."
     : "Editing " + rid + ". Remove existing attachments individually or add new files.", "");
-  try { var fc = $("#formCard"); if (fc.scrollIntoView) fc.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+  setDashboardNotice("", "");
+  showDashboardView("add");
 }
 
 function cancelEdit() {
-  editingId = "";
-  clearForm(true);
-  $("#formTitle").textContent = "Add achievement";
-  $("#submitBtn").textContent = "Save achievement";
-  $("#cancelBtn").hidden = true;
-  setMsg($("#formMsg"), "", "");
+  resetAchievementEditor();
+  showDashboardView("achievements");
 }
 
 function doSubmit() {
@@ -559,9 +601,12 @@ function doSubmit() {
     })
     .then(function (res) {
       $("#submitBtn").disabled = false;
+      if (handleAuthorizationError(res)) return;
       if (res && res.ok) {
-        if (updating) { setMsg($("#formMsg"), "✓ Updated " + res.recordId + ".", "ok"); cancelEdit(); }
-        else { setMsg($("#formMsg"), "✓ Saved as " + (res.recordId || "a new record") + "! You can add another.", "ok"); clearForm(false); }
+        var savedId = res.recordId || "the new record";
+        resetAchievementEditor();
+        setDashboardNotice(updating ? "Updated " + savedId + " successfully." : "Saved " + savedId + " successfully.", "ok");
+        showDashboardView("achievements");
         loadList();
       } else { setMsg($("#formMsg"), "Could not save: " + ((res && res.error) || "unknown error"), "err"); }
     })
@@ -573,10 +618,16 @@ function doDelete(rid) {
   setMsg($("#formMsg"), "Deleting " + rid + "…", "");
   callScript({ action: "delete", passcode: session.passcode, recordId: rid })
     .then(function (res) {
-      if (res && res.ok) { setMsg($("#formMsg"), "✓ Deleted " + rid + ".", "ok"); if (editingId === rid) cancelEdit(); loadList(); }
-      else { setMsg($("#formMsg"), "Could not delete: " + ((res && res.error) || "error"), "err"); }
+      if (handleAuthorizationError(res)) return;
+      if (res && res.ok) {
+        if (editingId === rid) resetAchievementEditor();
+        setDashboardNotice("Deleted " + rid + ". Uploaded files remain in Google Drive.", "ok");
+        showDashboardView("achievements");
+        loadList();
+      }
+      else { setDashboardNotice("Could not delete: " + ((res && res.error) || "error"), "err"); }
     })
-    .catch(function (e) { setMsg($("#formMsg"), "Connection error: " + e, "err"); });
+    .catch(function (e) { setDashboardNotice("Connection error: " + e, "err"); });
 }
 
 function clearForm(keepCategory) {
@@ -648,6 +699,18 @@ function initAdmin() {
     setMsg($("#profileMsg"), "", "");
   });
   $("#cancelBtn").addEventListener("click", function (e) { e.preventDefault(); cancelEdit(); });
+  $("#closeProfileBtn").addEventListener("click", function () { showDashboardView("achievements"); });
+  $("#listAddAchievement").addEventListener("click", openAddAchievement);
+  document.querySelectorAll("[data-admin-view]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var view = button.getAttribute("data-admin-view");
+      if (view === "add") openAddAchievement();
+      else {
+        setDashboardNotice("", "");
+        showDashboardView(view);
+      }
+    });
+  });
   $("#logout").addEventListener("click", function (e) { e.preventDefault(); doLogout(); });
   $("#refreshList").addEventListener("click", function (e) { e.preventDefault(); loadList(); });
   $("#entrySearch").addEventListener("input", function (e) {
