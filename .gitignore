@@ -1,0 +1,14 @@
+# OS / mount junk
+.DS_Store
+Thumbs.db
+.fuse_hidden*
+*~
+
+# Local handover notes and copied setup values
+AGENTS.md
+PROJECT.md
+script_google.com.txt
+Firebase_Pingping_portfolio_web_script.txt
+
+# Local previews
+*-preview.png

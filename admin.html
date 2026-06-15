@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pingping Portfolio — Manage</title>
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="protected-page" data-protected-scripts="js/admin.js">
+  <div id="authGate" class="auth-gate">Checking family access...</div>
+  <header class="site-header admin-header">
+    <div class="container header-inner">
+      <div class="profile-text">
+        <h1>Family Admin</h1>
+        <p class="tagline">Add, edit, or remove achievements</p>
+      </div>
+      <div class="header-actions">
+        <a class="print-btn" href="index.html">← View Portfolio</a>
+        <button id="firebaseSignOut" class="print-btn ghost" type="button">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+
+    <!-- LOGIN -->
+    <section id="loginCard" class="card">
+      <h2 class="card-title">Sign in</h2>
+      <p class="muted small">Enter your family passcode to manage achievements.</p>
+      <div class="field">
+        <label for="passcode">Family passcode</label>
+        <input type="password" id="passcode" autocomplete="current-password" placeholder="Your passcode" />
+      </div>
+      <button id="loginBtn" class="btn-primary">Sign in</button>
+      <p id="loginMsg" class="form-msg"></p>
+    </section>
+
+    <!-- MINI PROFILE -->
+    <section id="profileCard" class="card" hidden>
+      <div class="form-head">
+        <div>
+          <h2 class="card-title">Mini profile</h2>
+          <p class="muted small">Update the introduction shown at the top of the portfolio.</p>
+        </div>
+      </div>
+      <div class="profile-editor">
+        <div class="profile-photo-editor">
+          <img id="profilePreview" src="assets/profile/profile.svg" alt="Profile preview" />
+          <input id="profilePhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          <p id="profilePhotoHint" class="field-hint">JPG, PNG, WebP, or GIF. Maximum 5 MB.</p>
+        </div>
+        <div class="profile-editor-fields">
+          <div class="grid2">
+            <div class="field"><label for="p-name">Display name</label><input id="p-name" placeholder="Pingping" /></div>
+            <div class="field"><label for="p-location">Location</label><input id="p-location" placeholder="Bangkok, Thailand" /></div>
+            <div class="field span2"><label for="p-tagline">Tagline</label><input id="p-tagline" placeholder="Student • Competitor • Lifelong Learner" /></div>
+            <div class="field span2"><label for="p-summary">Short introduction</label><textarea id="p-summary" rows="3" placeholder="A short introduction about Pingping’s journey"></textarea></div>
+            <div class="field span2"><label for="p-interests">Interests</label><input id="p-interests" placeholder="Mathematics, Science, Music, Art" /><p class="field-hint">Separate interests with commas.</p></div>
+          </div>
+          <button id="saveProfileBtn" type="button" class="btn-primary">Save profile</button>
+          <p id="profileMsg" class="form-msg"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <section id="formCard" class="card" hidden>
+      <div class="form-head">
+        <h2 class="card-title" id="formTitle">Add achievement</h2>
+        <p class="muted small">Signed in as <strong id="who"></strong>. <a href="#" id="logout">Log out</a></p>
+      </div>
+
+      <h3 class="group-title">Basics</h3>
+      <div class="grid2">
+        <div class="field span2">
+          <label for="f-title">Activity / Competition Name <span class="req">*</span></label>
+          <input id="f-title" placeholder="e.g. National Mathematics Olympiad" />
+        </div>
+        <div class="field">
+          <label for="f-category">Category <span class="req">*</span></label>
+          <select id="f-category">
+            <option>Math &amp; Science</option><option>Language</option>
+            <option>Arts &amp; Music</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-year">Year <span class="req">*</span></label>
+          <input id="f-year" type="number" min="2000" max="2100" placeholder="e.g. 2026" inputmode="numeric" />
+        </div>
+        <div class="field">
+          <label for="f-level">Level</label>
+          <input id="f-level" list="level-options" placeholder="Select or type a level" />
+        </div>
+        <div class="field"><label for="f-result">Result / Award</label><input id="f-result" list="result-options" placeholder="Select or type an award" /></div>
+        <div class="field"><label for="f-rank">Score / Rank</label><input id="f-rank" placeholder="e.g. 1st of 480, 98/100" /></div>
+        <div class="field"><label for="f-organizer">Organizer</label><input id="f-organizer" list="organizer-options" placeholder="Select or type an organizer" /></div>
+      </div>
+
+      <h3 class="group-title">Details</h3>
+      <div class="grid2">
+        <div class="field"><label for="f-age">Age</label><input id="f-age" type="number" min="1" max="30" placeholder="e.g. 14" /></div>
+        <div class="field"><label for="f-grade">Grade</label><input id="f-grade" list="grade-options" placeholder="Select or type a grade" /></div>
+        <div class="field span2"><label for="f-school">School</label><input id="f-school" list="school-options" placeholder="Select or type a school" /></div>
+        <div class="field">
+          <label for="f-ptype">Participation Type</label>
+          <select id="f-ptype"><option value="">—</option><option>Individual</option><option>Pair</option><option>Team</option><option>Group</option></select>
+        </div>
+        <div class="field"><label for="f-role">Role</label><input id="f-role" list="role-options" placeholder="Select or type a role" /></div>
+        <div class="field"><label for="f-frequency">Frequency</label><input id="f-frequency" list="frequency-options" placeholder="Select or type a frequency" /></div>
+        <div class="field"><label for="f-duration">Duration / Period</label><input id="f-duration" list="duration-options" placeholder="e.g. One day, May 2026" /></div>
+      </div>
+
+      <h3 class="group-title">Evidence (certificate / award / photo)</h3>
+      <div class="grid2">
+        <input id="f-etype" type="hidden" />
+        <div class="field span2">
+          <label>Evidence attachments <span class="muted">(up to 5 images or PDFs)</span></label>
+          <div class="attachment-picker">
+            <input id="f-files" class="visually-hidden-file" type="file" accept="image/*,application/pdf,.pdf" multiple />
+            <button id="addFilesBtn" type="button" class="btn-ghost-2 add-files-btn">+ Add files</button>
+            <span class="field-hint">You can add files several times from different folders. They upload together when you save.</span>
+          </div>
+          <div id="pendingFileList" class="pending-file-list"></div>
+          <p id="fileSelectionHint" class="field-hint">Video files are not accepted. Add a YouTube or video link below instead.</p>
+        </div>
+        <div class="field span2">
+          <label for="f-evlink">Evidence and video links <span class="muted">(one per line — Google Drive or YouTube)</span></label>
+          <textarea id="f-evlink" rows="2" placeholder="https://youtu.be/…&#10;https://drive.google.com/…"></textarea>
+        </div>
+      </div>
+
+      <h3 class="group-title">Story &amp; memories</h3>
+      <div class="grid2">
+        <div class="field span2"><label for="f-reflection">Pingping’s Memory</label><textarea id="f-reflection" rows="3" placeholder="A moment, feeling, challenge, or detail Pingping wants to remember"></textarea></div>
+        <div class="field"><label for="f-dad-note">Dad's Memory</label><textarea id="f-dad-note" rows="3" placeholder="A moment, feeling, or detail Dad wants to remember"></textarea></div>
+        <div class="field"><label for="f-mom-note">Mom's Memory</label><textarea id="f-mom-note" rows="3" placeholder="A moment, feeling, or detail Mom wants to remember"></textarea></div>
+        <div class="field span2"><label for="f-notes">Notes / Description</label><textarea id="f-notes" rows="2" placeholder="Short description shown on the card"></textarea></div>
+        <div class="field">
+          <label for="f-importance">Importance Level</label>
+          <select id="f-importance"><option value="">—</option><option>High</option><option>Medium</option><option>Low</option></select>
+        </div>
+        <div class="field">
+          <label for="f-uni">Feature on Portfolio</label>
+          <select id="f-uni"><option value="">—</option><option>Yes</option><option>No</option></select>
+        </div>
+      </div>
+
+      <datalist id="level-options">
+        <option value="International"></option><option value="National"></option>
+        <option value="Regional"></option><option value="Provincial"></option>
+        <option value="Local"></option><option value="School"></option><option value="Online"></option>
+      </datalist>
+      <datalist id="result-options">
+        <option value="Gold Award"></option><option value="Gold Medal"></option>
+        <option value="Silver Award"></option><option value="Silver Medal"></option>
+        <option value="Bronze Award"></option><option value="Bronze Medal"></option>
+        <option value="Champion"></option><option value="Winner"></option>
+        <option value="1st Runner-up"></option><option value="2nd Runner-up"></option>
+        <option value="Finalist"></option><option value="Certificate of Achievement"></option>
+        <option value="Participant"></option>
+      </datalist>
+      <datalist id="organizer-options"></datalist>
+      <datalist id="grade-options">
+        <option value="Kindergarten"></option><option value="Grade 1"></option><option value="Grade 2"></option>
+        <option value="Grade 3"></option><option value="Grade 4"></option><option value="Grade 5"></option>
+        <option value="Grade 6"></option><option value="Grade 7"></option><option value="Grade 8"></option>
+        <option value="Grade 9"></option><option value="Grade 10"></option><option value="Grade 11"></option><option value="Grade 12"></option>
+      </datalist>
+      <datalist id="school-options"><option value="XCL American School of Bangkok"></option></datalist>
+      <datalist id="role-options">
+        <option value="Contestant"></option><option value="Participant"></option><option value="Team Member"></option>
+        <option value="Team Captain"></option><option value="Soloist"></option><option value="Performer"></option><option value="Presenter"></option>
+      </datalist>
+      <datalist id="frequency-options">
+        <option value="One-time"></option><option value="Annual"></option><option value="Weekly"></option>
+        <option value="Monthly"></option><option value="Ongoing"></option>
+      </datalist>
+      <datalist id="duration-options">
+        <option value="One day"></option><option value="Multiple days"></option><option value="One week"></option>
+        <option value="One month"></option><option value="Three months"></option><option value="Full academic year"></option><option value="Ongoing"></option>
+      </datalist>
+
+      <div class="form-actions">
+        <button id="submitBtn" class="btn-primary">Save achievement</button>
+        <button id="cancelBtn" class="btn-ghost-2" hidden>Cancel edit</button>
+      </div>
+      <p id="formMsg" class="form-msg"></p>
+    </section>
+
+    <!-- SAVED ENTRIES -->
+    <section id="listCard" class="card" hidden>
+      <div class="form-head">
+        <h2 class="card-title">Saved achievements</h2>
+        <a href="#" id="refreshList" class="small">↻ Refresh</a>
+      </div>
+      <div id="listTools" class="admin-list-tools" hidden>
+        <div class="field list-search-field">
+          <label for="entrySearch">Search saved achievements</label>
+          <input type="search" id="entrySearch" placeholder="Name, record ID, organizer, award, school…" />
+        </div>
+        <div class="admin-list-filters">
+          <div class="field">
+            <label for="listCategory">Category</label>
+            <select id="listCategory"><option value="">All categories</option></select>
+          </div>
+          <div class="field">
+            <label for="listYear">Year</label>
+            <select id="listYear"><option value="">All years</option></select>
+          </div>
+          <div class="field">
+            <label for="listPageSize">Show</label>
+            <select id="listPageSize">
+              <option value="10">10 per page</option>
+              <option value="25">25 per page</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+          <button type="button" id="clearListFilters" class="mini list-clear">Clear filters</button>
+        </div>
+      </div>
+      <p id="listMsg" class="muted small">Loading…</p>
+      <div id="entryList" class="entry-list"></div>
+      <nav id="listPagination" class="list-pagination" aria-label="Saved achievements pages"></nav>
+    </section>
+
+    <section id="notConfigured" class="card warn" hidden>
+      <h2 class="card-title">Almost there…</h2>
+      <p class="small">The admin backend isn't connected yet. Paste your Apps Script Web App URL into
+      <code>data/config.js</code> (the <code>scriptUrl</code> field). See <code>SETUP.md</code>.</p>
+    </section>
+
+  </main>
+
+  <script src="data/config.js"></script>
+  <script type="module" src="js/protected-page.js"></script>
+</body>
+</html>

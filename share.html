@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shared Achievement — Pingping</title>
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="share-page">
+  <header class="share-header">
+    <div class="container share-header-inner">
+      <div class="share-profile">
+        <img id="shareProfilePhoto" src="assets/profile/profile.svg" alt="Profile photo" />
+        <div>
+          <h1 id="shareProfileName">Pingping</h1>
+          <p>A shared achievement from the family portfolio</p>
+        </div>
+      </div>
+      <div class="share-actions">
+        <button id="copyShareLink" class="share-copy" type="button">Share this page</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="share-main">
+    <div id="shareStatus" class="share-status">Loading shared achievement…</div>
+    <div id="shareEntry"></div>
+    <p class="share-note">This family share link shows only the achievement shared with you.</p>
+  </main>
+
+  <div id="viewer" class="viewer" hidden>
+    <div class="viewer-backdrop" data-close></div>
+    <div class="viewer-dialog" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+      <div class="viewer-head">
+        <div>
+          <h3 id="viewerTitle"></h3>
+          <p id="viewerSub" class="muted"></p>
+        </div>
+        <div class="viewer-actions">
+          <a id="viewerDownload" class="btn btn-ghost" target="_blank" rel="noopener" href="#">Download</a>
+          <a id="viewerOpen" class="btn btn-ghost" target="_blank" rel="noopener" href="#">Open in tab</a>
+          <button class="btn btn-close" data-close aria-label="Close">&times;</button>
+        </div>
+      </div>
+      <div class="viewer-tabs" id="viewerTabs"></div>
+      <div class="viewer-body" id="viewerBody"></div>
+    </div>
+  </div>
+
+  <script src="data/config.js"></script>
+  <script src="js/share.js"></script>
+</body>
+</html>

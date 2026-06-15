@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pingping — Portfolio</title>
+  <meta name="description" content="Academic and extracurricular achievement portfolio of Pingping — competitions, awards, and certificates." />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="protected-page" data-protected-scripts="data/portfolio.js,js/app.js">
+  <div id="authGate" class="auth-gate">Checking family access...</div>
+  <!-- ===== Header / Profile ===== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="profile">
+        <img id="profilePhoto" class="profile-photo" src="" alt="Profile photo" />
+        <div class="profile-text">
+          <h1 id="profileName">Loading…</h1>
+          <p id="profileTagline" class="tagline"></p>
+          <p id="profileSummary" class="summary"></p>
+          <ul id="profileMeta" class="profile-meta"></ul>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a class="print-btn ghost" href="admin.html">Family Admin</a>
+        <button class="print-btn" onclick="window.print()" title="Save or print as PDF"><span>Print / Save PDF</span></button>
+        <button id="firebaseSignOut" class="print-btn ghost" type="button">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Stats ===== -->
+  <section class="stats-band">
+    <div class="container stats-grid" id="statsGrid"></div>
+  </section>
+
+  <!-- ===== Controls ===== -->
+  <section class="controls">
+    <div class="container controls-inner">
+      <input type="search" id="searchInput" class="search" placeholder="Search achievements, organizers, skills…" />
+      <div class="filter-row" id="categoryFilters"></div>
+      <div class="filter-row" id="levelFilters"></div>
+      <div class="filter-row" id="uniFilters"></div>
+      <div class="filter-row time-filter-row" id="timeFilters"></div>
+    </div>
+  </section>
+
+  <!-- ===== Timeline ===== -->
+  <main class="container">
+    <div id="resultCount" class="result-count"></div>
+    <div id="timeline" class="timeline"></div>
+    <div id="emptyState" class="empty-state" hidden>No achievements match your filters.</div>
+    <nav id="portfolioPagination" class="list-pagination portfolio-pagination" aria-label="Portfolio pages"></nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p id="footerName"></p>
+      <p class="muted">Built with Firebase Authentication · Google Sheets &amp; Drive · Apps Script · GitHub Pages</p>
+    </div>
+  </footer>
+
+  <!-- ===== Certificate Viewer Modal ===== -->
+  <div id="viewer" class="viewer" hidden>
+    <div class="viewer-backdrop" data-close></div>
+    <div class="viewer-dialog" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+      <div class="viewer-head">
+        <div>
+          <h3 id="viewerTitle"></h3>
+          <p id="viewerSub" class="muted"></p>
+        </div>
+        <div class="viewer-actions">
+          <a id="viewerDownload" class="btn btn-ghost" download href="#">Download</a>
+          <a id="viewerOpen" class="btn btn-ghost" target="_blank" rel="noopener" href="#">Open in tab</a>
+          <button class="btn btn-close" data-close aria-label="Close">&times;</button>
+        </div>
+      </div>
+      <div class="viewer-tabs" id="viewerTabs"></div>
+      <div class="viewer-body" id="viewerBody"></div>
+    </div>
+  </div>
+
+  <script src="data/config.js"></script>
+  <script type="module" src="js/protected-page.js"></script>
+</body>
+</html>

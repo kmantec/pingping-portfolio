@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pingping Portfolio — Family Login</title>
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="family-login-page">
+  <main class="family-login-shell">
+    <section class="family-login-frame" aria-labelledby="loginTitle">
+      <div class="login-story">
+        <div class="login-story-inner">
+          <div class="login-brand">
+            <div class="login-mark" aria-hidden="true">
+              <img id="loginProfilePhoto" alt="" hidden />
+              <span id="loginProfileFallback">P</span>
+            </div>
+            <span>Pingping's Portfolio</span>
+          </div>
+
+          <div class="login-story-copy">
+            <p class="login-kicker">Her journey, thoughtfully kept</p>
+            <h1 id="loginTitle">Achievements worth remembering.</h1>
+            <p>A private family collection of Pingping's competitions, awards, certificates, and proud moments as she grows.</p>
+          </div>
+
+          <ul class="login-features" aria-label="Portfolio contents">
+            <li><span>01</span>Competitions &amp; awards</li>
+            <li><span>02</span>Certificates &amp; evidence</li>
+            <li><span>03</span>Stories &amp; memories</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="family-login-card">
+        <div class="login-card-head">
+          <p class="login-eyebrow">Private family access</p>
+          <h2>Welcome back</h2>
+          <p>Continue to Pingping's Portfolio with an approved family Google account.</p>
+        </div>
+
+        <button id="loginBtn" class="google-signin" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.32 2.98-7.41Z"/>
+            <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.63-2.36l-3.24-2.54c-.9.6-2.05.96-3.39.96-2.61 0-4.82-1.77-5.61-4.14H3.04v2.62A10 10 0 0 0 12 22Z"/>
+            <path fill="#FBBC05" d="M6.39 13.92A6 6 0 0 1 6.07 12c0-.67.11-1.32.32-1.92V7.46H3.04A10 10 0 0 0 2 12c0 1.61.38 3.14 1.04 4.54l3.35-2.62Z"/>
+            <path fill="#EA4335" d="M12 5.94c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.46l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+        <p class="login-security-note">Only approved family accounts can enter.</p>
+        <p id="loginMsg" class="form-msg" role="status"></p>
+
+        <div id="setupRequired" class="notice" hidden>
+          Firebase Authentication is not configured yet. Follow <code>AUTH_SETUP.md</code>.
+        </div>
+      </div>
+    </section>
+    <p class="login-footer">A private achievement archive for the family</p>
+  </main>
+
+  <script src="data/config.js"></script>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

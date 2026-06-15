@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="720" viewBox="0 0 1000 720">
+  <rect width="1000" height="720" fill="#fffdf7"/>
+  <rect x="22" y="22" width="956" height="676" fill="none" stroke="#c79a3a" stroke-width="4"/>
+  <rect x="36" y="36" width="928" height="648" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="500" y="120" text-anchor="middle" font-family="Georgia,serif" font-size="44" font-weight="bold" fill="#1e3a5f">Certificate of Achievement</text>
+  <line x1="320" y1="150" x2="680" y2="150" stroke="#c79a3a" stroke-width="2"/>
+  <text x="500" y="220" text-anchor="middle" font-family="Inter,Arial" font-size="20" fill="#5b6b82">This certificate is proudly presented to</text>
+  <text x="500" y="300" text-anchor="middle" font-family="Georgia,serif" font-size="54" font-style="italic" fill="#16304f">Pingping</text>
+  <line x1="280" y1="330" x2="720" y2="330" stroke="#e3e8ef" stroke-width="2"/>
+  <text x="500" y="400" text-anchor="middle" font-family="Inter,Arial" font-size="22" fill="#33415a">for outstanding performance and dedication</text>
+  <text x="500" y="436" text-anchor="middle" font-family="Inter,Arial" font-size="22" fill="#33415a">demonstrated in competition.</text>
+  <circle cx="500" cy="540" r="52" fill="none" stroke="#c79a3a" stroke-width="3"/>
+  <text x="500" y="535" text-anchor="middle" font-family="Georgia,serif" font-size="18" font-weight="bold" fill="#c79a3a">GOLD</text>
+  <text x="500" y="558" text-anchor="middle" font-family="Inter,Arial" font-size="12" fill="#c79a3a">AWARD</text>
+  <text x="250" y="650" text-anchor="middle" font-family="Inter,Arial" font-size="15" fill="#5b6b82">_____________________</text>
+  <text x="250" y="672" text-anchor="middle" font-family="Inter,Arial" font-size="14" fill="#1e3a5f">Director</text>
+  <text x="750" y="650" text-anchor="middle" font-family="Inter,Arial" font-size="15" fill="#5b6b82">_____________________</text>
+  <text x="750" y="672" text-anchor="middle" font-family="Inter,Arial" font-size="14" fill="#1e3a5f">Date</text>
+  <text x="500" y="700" text-anchor="middle" font-family="Inter,Arial" font-size="11" fill="#aab4c2">SAMPLE — replace this file with the real certificate image (JPG / PNG)</text>
+</svg>
